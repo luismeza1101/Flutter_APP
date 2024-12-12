@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/filter_acordion.dart';
+import 'package:flutter_application_1/services/recipes_by_name.dart';
 
 class OptionsSearch extends StatefulWidget {
-  const OptionsSearch({super.key});
+  final Function(List<Map<String, dynamic>>) onSearch;
+  const OptionsSearch({super.key, required this.onSearch});
 
   @override
   State<OptionsSearch> createState() => _OptionsSearchState();
 }
 
 class _OptionsSearchState extends State<OptionsSearch> {
-  bool _isExpanded = false;
+  final TextEditingController _controller = TextEditingController();
 
-  void _openFilter() {
-    setState(() {
-      _isExpanded = true;
-    });
-  }
-
-  void _closeFilters() {
-    setState(() {
-      _isExpanded = false;
-    });
+  void _search() async {
+    final query = _controller.text; 
+    final fetchedRecipes = await fetchSpecificRecipes(query);
+    widget.onSearch(fetchedRecipes);
   }
 
   @override
@@ -31,6 +26,7 @@ class _OptionsSearchState extends State<OptionsSearch> {
           children: [
             Expanded(
               child: TextField(
+                controller: _controller,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -45,15 +41,16 @@ class _OptionsSearchState extends State<OptionsSearch> {
             ),
             const SizedBox(width: 10),
             ElevatedButton(
-              onPressed: _openFilter,
-              child: const Text('Filter'),
+              onPressed: () {
+                _search();
+              },
+              child: const Text('Buscar'),
             )
           ],
         ),
         const SizedBox(
           height: 20,
         ),
-        FilterAcordion(isExpanded: _isExpanded, closeFilters: _closeFilters,)
       ],
     );
   }

@@ -1,82 +1,63 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_application_1/services/recetes_by_ingredients.dart';
-import 'package:flutter_application_1/services/recetes_excluyen_ingredient.dart';
-// import 'package:flutter_application_1/services/recetes.dart';
-// import 'package:flutter_application_1/services/recetes_by_name.dart';
+import 'package:flutter_application_1/services/recipes_random.dart';
+import 'package:flutter_application_1/widgets/recipes.dart';
 import 'package:flutter_application_1/widgets/options_search.dart';
-// import 'package:flutter_application_1/widgets/filter_acordion.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  List<Map<String, dynamic>> _recipes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRandomRecipes();
+  }
+
+  Future<void> _loadRandomRecipes() async {
+    final randomRecipes = await fetchRecipesRandoms();
+
+    setState(() {
+      _recipes = randomRecipes;
+    });
+
+  }
+
+  void _updateRecipes(List<Map<String, dynamic>> newRecipes) {
+    setState(() {
+      _recipes = newRecipes;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(70),
-          child: AppBar(
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {},
-            ),
-            title: Image.asset(
-              'assets/imgs/logo.png',
-              height: 65.0,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '¿QUÉ COMIDA ESTÁS BUSCANDO?',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
-        ),
-        body: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '¿QUÉ COMIDA ESTÁS BUSCANDO?',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 10),
-              OptionsSearch(),
-              SizedBox(height: 10),
-              Expanded(
-                // child: Recetes(),
-                // child: RecetesByName(),
-                child: RecetesExcluyenIngredient(),
-              ),
-            ],
+          const SizedBox(height: 10),
+          OptionsSearch(onSearch: _updateRecipes),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Recipes(
+              recipes: _recipes,
+            ),
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home,
-                color: Colors.red,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.favorite_border,
-                color: Colors.red,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                color: Colors.red,
-              ),
-              label: '',
-            ),
-          ],
-          elevation: 0, // Sin sombra
-        ),
+        ],
       ),
     );
   }
